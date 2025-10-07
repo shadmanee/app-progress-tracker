@@ -10,21 +10,39 @@
 </div>
 
 <!-- Search and Filter Section -->
+<!-- Search and Filter Section -->
 <div class="card mb-4">
     <div class="card-body">
         <h5>Search & Filter</h5>
         <div class="row g-3">
             <div class="col-md-2">
-                <input type="text" class="form-control" id="searchName" placeholder="Search by name..." onkeyup="filterTable()">
+                <input type="text" class="form-control" id="searchName" placeholder="Search by name...">
             </div>
             <div class="col-md-2">
-                <input type="text" class="form-control" id="searchUniversity" placeholder="Search university..." onkeyup="filterTable()">
+                <input type="text" class="form-control" id="searchTitle" placeholder="Search by title...">
             </div>
             <div class="col-md-2">
-                <input type="text" class="form-control" id="searchDepartment" placeholder="Search department..." onkeyup="filterTable()">
+                <input type="text" class="form-control" id="searchUniversity" placeholder="Search university...">
             </div>
             <div class="col-md-2">
-                <select class="form-control" id="filterHiringStatus" onchange="filterTable()">
+                <input type="text" class="form-control" id="searchDepartment" placeholder="Search department...">
+            </div>
+            <div class="col-md-2">
+                <input type="text" class="form-control" id="searchCountry" placeholder="Search country...">
+            </div>
+            <div class="col-md-2">
+                <input type="text" class="form-control" id="searchCity" placeholder="Search city...">
+            </div>
+        </div>
+        <div class="row g-3 mt-2">
+            <div class="col-md-2">
+                <input type="text" class="form-control" id="searchProgram" placeholder="Search program...">
+            </div>
+            <div class="col-md-2">
+                <input type="text" class="form-control" id="searchResearchArea" placeholder="Search research area...">
+            </div>
+            <div class="col-md-2">
+                <select class="form-control" id="filterHiringStatus">
                     <option value="">All Hiring Status</option>
                     <option value="Hiring">Hiring</option>
                     <option value="Not Hiring">Not Hiring</option>
@@ -32,24 +50,7 @@
                 </select>
             </div>
             <div class="col-md-2">
-                <input type="text" class="form-control" id="searchCountry" placeholder="Search country..." onkeyup="filterTable()">
-            </div>
-            <div class="col-md-2">
-                <input type="text" class="form-control" id="searchCity" placeholder="Search city..." onkeyup="filterTable()">
-            </div>
-        </div>
-        <div class="row g-3 mt-2">
-            <div class="col-md-2">
-                <input type="text" class="form-control" id="searchProgram" placeholder="Search program..." onkeyup="filterTable()">
-            </div>
-            <div class="col-md-2">
-                <input type="text" class="form-control" id="searchResearchArea" placeholder="Search research area..." onkeyup="filterTable()">
-            </div>
-            <div class="col-md-2">
-                <input type="text" class="form-control" id="searchEmail" placeholder="Search email..." onkeyup="filterTable()">
-            </div>
-            <div class="col-md-2">
-                <select class="form-control" id="filterContactMethod" onchange="filterTable()">
+                <select class="form-control" id="filterContactMethod">
                     <option value="">All Contact Methods</option>
                     <option value="Email">Email</option>
                     <option value="Application">Application</option>
@@ -57,13 +58,14 @@
                 </select>
             </div>
             <div class="col-md-2">
-                <input type="text" class="form-control" id="searchState" placeholder="Search state..." onkeyup="filterTable()">
+                <input type="text" class="form-control" id="searchState" placeholder="Search state...">
             </div>
             <div class="col-md-2">
-                <input type="text" class="form-control" id="searchRanking" placeholder="Search ranking..." onkeyup="filterTable()">
+                <input type="text" class="form-control" id="searchRanking" placeholder="Search ranking...">
             </div>
         </div>
         <div class="mt-2">
+            <button class="btn btn-primary btn-sm me-1" onclick="filterTable()">Search</button>
             <button class="btn btn-outline-secondary btn-sm" onclick="clearFilters()">Clear Filters</button>
         </div>
     </div>
