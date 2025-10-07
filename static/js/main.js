@@ -90,11 +90,11 @@ document.getElementById('confirmDeleteBtn').addEventListener('click', function()
 // Function to filter the professor table based on search criteria
 function filterTable() {
     const nameFilter = document.getElementById('searchName').value.toLowerCase();
+    const titleFilter = document.getElementById('searchTitle').value.toLowerCase(); // Get title filter value
     const universityFilter = document.getElementById('searchUniversity').value.toLowerCase();
     const departmentFilter = document.getElementById('searchDepartment').value.toLowerCase();
     const programFilter = document.getElementById('searchProgram').value.toLowerCase();
     const researchAreaFilter = document.getElementById('searchResearchArea').value.toLowerCase();
-    const emailFilter = document.getElementById('searchEmail').value.toLowerCase();
     const hiringStatusFilter = document.getElementById('filterHiringStatus').value.toLowerCase();
     const contactMethodFilter = document.getElementById('filterContactMethod').value.toLowerCase();
     const countryFilter = document.getElementById('searchCountry').value.toLowerCase();
@@ -106,24 +106,26 @@ function filterTable() {
     
     rows.forEach(row => {
         const name = row.getAttribute('data-name');
+        const title = row.getAttribute('data-title'); // Get title from data attribute
         const university = row.getAttribute('data-university');
         const department = row.getAttribute('data-department');
         const hiringStatus = row.getAttribute('data-hiring-status');
         const contactMethod = row.getAttribute('data-contact-method');
-        const email = row.getAttribute('data-email');
         const country = row.getAttribute('data-country');
         const city = row.getAttribute('data-city');
         const state = row.getAttribute('data-state');
         const ranking = row.getAttribute('data-ranking');
-        const programs = row.querySelector('.programs-cell').getAttribute('data-programs');
+        // Note: Programs and Research Areas are handled via their respective cells' data attributes if needed
+        // For now, we use the ones directly in the row's attributes or cell content
+        const programs = row.querySelector('.programs-cell') ? row.querySelector('.programs-cell').getAttribute('data-programs') : '';
         const researchAreas = row.querySelector('.research-areas-cell').getAttribute('data-research-areas');
 
         const matchesName = nameFilter === '' || name.includes(nameFilter);
+        const matchesTitle = titleFilter === '' || title.includes(titleFilter); // Check title filter
         const matchesUniversity = universityFilter === '' || university.includes(universityFilter);
         const matchesDepartment = departmentFilter === '' || department.includes(departmentFilter);
         const matchesProgram = programFilter === '' || programs.includes(programFilter);
         const matchesResearchArea = researchAreaFilter === '' || researchAreas.includes(researchAreaFilter);
-        const matchesEmail = emailFilter === '' || email.includes(emailFilter);
         const matchesHiringStatus = hiringStatusFilter === '' || hiringStatus.includes(hiringStatusFilter);
         const matchesContactMethod = contactMethodFilter === '' || contactMethod.includes(contactMethodFilter);
         const matchesCountry = countryFilter === '' || country.includes(countryFilter);
@@ -131,9 +133,8 @@ function filterTable() {
         const matchesState = stateFilter === '' || state.includes(stateFilter);
         const matchesRanking = rankingFilter === '' || ranking.includes(rankingFilter);
 
-        if (matchesName && matchesUniversity && matchesDepartment && 
-            matchesProgram && matchesResearchArea && matchesEmail && 
-            matchesHiringStatus && matchesContactMethod && 
+        if (matchesName && matchesTitle && matchesUniversity && matchesDepartment && 
+            matchesProgram && matchesResearchArea && matchesHiringStatus && matchesContactMethod && 
             matchesCountry && matchesCity && matchesState && matchesRanking) {
             row.style.display = '';
         } else {
@@ -145,16 +146,16 @@ function filterTable() {
 // Function to clear all filters
 function clearFilters() {
     document.getElementById('searchName').value = '';
+    document.getElementById('searchTitle').value = ''; // Clear title filter
     document.getElementById('searchUniversity').value = '';
     document.getElementById('searchDepartment').value = '';
     document.getElementById('searchProgram').value = '';
     document.getElementById('searchResearchArea').value = '';
-    document.getElementById('searchEmail').value = '';
     document.getElementById('filterHiringStatus').value = '';
     document.getElementById('filterContactMethod').value = '';
     document.getElementById('searchCountry').value = '';
     document.getElementById('searchCity').value = '';
     document.getElementById('searchState').value = '';
     document.getElementById('searchRanking').value = '';
-    filterTable();
+    filterTable(); // Call filterTable to apply the cleared filters
 }
