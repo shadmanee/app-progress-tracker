@@ -87,75 +87,126 @@ document.getElementById('confirmDeleteBtn').addEventListener('click', function()
     }
 });
 
-// Function to filter the professor table based on search criteria
+// --- utils ---
+const normalize = (s) => (s || "").toString().toLowerCase().trim().replace(/\s+/g, " ");
+const tokenize = (s) => normalize(s).split(" ").filter(Boolean);
+
+// Simple debounce for input typing
+function debounce(fn, delay = 250) {
+  let t;
+  return (...args) => {
+    clearTimeout(t);
+    t = setTimeout(() => fn(...args), delay);
+  };
+}
+
+// --- core filtering ---
 function filterTable() {
-    const nameFilter = document.getElementById('searchName').value.toLowerCase();
-    const titleFilter = document.getElementById('searchTitle').value.toLowerCase(); // Get title filter value
-    const universityFilter = document.getElementById('searchUniversity').value.toLowerCase();
-    const departmentFilter = document.getElementById('searchDepartment').value.toLowerCase();
-    const programFilter = document.getElementById('searchProgram').value.toLowerCase();
-    const researchAreaFilter = document.getElementById('searchResearchArea').value.toLowerCase();
-    const hiringStatusFilter = document.getElementById('filterHiringStatus').value.toLowerCase();
-    const contactMethodFilter = document.getElementById('filterContactMethod').value.toLowerCase();
-    const countryFilter = document.getElementById('searchCountry').value.toLowerCase();
-    const cityFilter = document.getElementById('searchCity').value.toLowerCase();
-    const stateFilter = document.getElementById('searchState').value.toLowerCase();
-    const rankingFilter = document.getElementById('searchRanking').value.toLowerCase();
+  // Search only these fields:
+  // name + location (country, city, state)
+  const tokens = tokenize(document.getElementById('globalSearch').value);
 
-    const rows = document.querySelectorAll('#professorTable tbody tr');
-    
-    rows.forEach(row => {
-        const name = row.getAttribute('data-name');
-        const title = row.getAttribute('data-title'); // Get title from data attribute
-        const university = row.getAttribute('data-university');
-        const department = row.getAttribute('data-department');
-        const hiringStatus = row.getAttribute('data-hiring-status');
-        const contactMethod = row.getAttribute('data-contact-method');
-        const country = row.getAttribute('data-country');
-        const city = row.getAttribute('data-city');
-        const state = row.getAttribute('data-state');
-        const ranking = row.getAttribute('data-ranking');
-        // Note: Programs and Research Areas are handled via their respective cells' data attributes if needed
-        // For now, we use the ones directly in the row's attributes or cell content
-        const programs = row.querySelector('.programs-cell') ? row.querySelector('.programs-cell').getAttribute('data-programs') : '';
-        const researchAreas = row.querySelector('.research-areas-cell').getAttribute('data-research-areas');
+  // Filters (do not participate in global search)
+  const hiringStatusFilter = normalize(document.getElementById('filterHiringStatus').value);
+  const contactMethodFilter = normalize(document.getElementById('filterContactMethod').value);
+  const programFilter = normalize(document.getElementById('filterProgram').value);
+  const researchAreaFilter = normalize(document.getElementById('filterResearchArea').value);
+  const titleFilter = normalize(document.getElementById('filterTitle').value);
+  const universityFilter = normalize(document.getElementById('filterUniversity').value);
+  const departmentFilter = normalize(document.getElementById('filterDepartment').value);
 
-        const matchesName = nameFilter === '' || name.includes(nameFilter);
-        const matchesTitle = titleFilter === '' || title.includes(titleFilter); // Check title filter
-        const matchesUniversity = universityFilter === '' || university.includes(universityFilter);
-        const matchesDepartment = departmentFilter === '' || department.includes(departmentFilter);
-        const matchesProgram = programFilter === '' || programs.includes(programFilter);
-        const matchesResearchArea = researchAreaFilter === '' || researchAreas.includes(researchAreaFilter);
-        const matchesHiringStatus = hiringStatusFilter === '' || hiringStatus.includes(hiringStatusFilter);
-        const matchesContactMethod = contactMethodFilter === '' || contactMethod.includes(contactMethodFilter);
-        const matchesCountry = countryFilter === '' || country.includes(countryFilter);
-        const matchesCity = cityFilter === '' || city.includes(cityFilter);
-        const matchesState = stateFilter === '' || state.includes(stateFilter);
-        const matchesRanking = rankingFilter === '' || ranking.includes(rankingFilter);
+  const rows = document.querySelectorAll('#professorTable tbody tr');
 
-        if (matchesName && matchesTitle && matchesUniversity && matchesDepartment && 
-            matchesProgram && matchesResearchArea && matchesHiringStatus && matchesContactMethod && 
-            matchesCountry && matchesCity && matchesState && matchesRanking) {
-            row.style.display = '';
-        } else {
-            row.style.display = 'none';
-        }
-    });
+  rows.forEach(row => {
+    // row dataset
+    const name = normalize(row.getAttribute('data-name'));
+    const country = normalize(row.getAttribute('data-country'));
+    const city = normalize(row.getAttribute('data-city'));
+    const state = normalize(row.getAttribute('data-state'));
+    const hiringStatus = normalize(row.getAttribute('data-hiring-status'));
+    const contactMethod = normalize(row.getAttribute('data-contact-method'));
+    const title = normalize(row.getAttribute('data-title'));
+    const university = normalize(row.getAttribute('data-university'));
+    const department = normalize(row.getAttribute('data-department'));
+    const programs = normalize(row.querySelector('.programs-cell')?.getAttribute('data-programs') || "");
+    const researchAreas = normalize(row.querySelector('.research-areas-cell')?.getAttribute('data-research-areas') || "");
+
+    // Global search haystack (name + location only)
+    const haystack = `${name} ${country} ${city} ${state}`;
+    const matchesGlobal = tokens.every(t => haystack.includes(t));
+
+    // Independent filters (substring matches)
+    const matchesHiring = !hiringStatusFilter || hiringStatus.includes(hiringStatusFilter);
+    const matchesContact = !contactMethodFilter || contactMethod.includes(contactMethodFilter);
+    const matchesProgram = !programFilter || programs.includes(programFilter);
+    const matchesRA = !researchAreaFilter || researchAreas.includes(researchAreaFilter);
+    const matchesTitle = !titleFilter || title.includes(titleFilter);
+    const matchesUni = !universityFilter || university.includes(universityFilter);
+    const matchesDept = !departmentFilter || department.includes(departmentFilter);
+
+    const show = matchesGlobal && matchesHiring && matchesContact && matchesProgram &&
+                 matchesRA && matchesTitle && matchesUni && matchesDept;
+
+    row.style.display = show ? '' : 'none';
+  });
+
+  sortRows(); // apply current sort on the visible set
 }
 
-// Function to clear all filters
+// --- sorting ---
+function sortRows() {
+  const sortBy = document.getElementById('sortBy').value;
+  if (!sortBy) return;
+
+  const tbody = document.querySelector('#professorTable tbody');
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+  const visibleRows = rows.filter(r => r.style.display !== 'none');
+
+  const getName = (r) => normalize(r.getAttribute('data-name'));
+  const getRanking = (r) => {
+    const raw = (r.getAttribute('data-ranking') || '').trim();
+    const n = parseFloat(raw);
+    return Number.isFinite(n) ? n : Number.POSITIVE_INFINITY; // push non-numeric to bottom
+  };
+
+  visibleRows.sort((a, b) => {
+    switch (sortBy) {
+      case 'name-asc':   return getName(a).localeCompare(getName(b));
+      case 'name-desc':  return getName(b).localeCompare(getName(a));
+      case 'ranking-asc':  return getRanking(a) - getRanking(b);
+      case 'ranking-desc': return getRanking(b) - getRanking(a);
+      default: return 0;
+    }
+  });
+
+  // Re-append visible rows in new order, keep hidden in place
+  visibleRows.forEach(r => tbody.appendChild(r));
+}
+
+// --- clear ---
 function clearFilters() {
-    document.getElementById('searchName').value = '';
-    document.getElementById('searchTitle').value = ''; // Clear title filter
-    document.getElementById('searchUniversity').value = '';
-    document.getElementById('searchDepartment').value = '';
-    document.getElementById('searchProgram').value = '';
-    document.getElementById('searchResearchArea').value = '';
-    document.getElementById('filterHiringStatus').value = '';
-    document.getElementById('filterContactMethod').value = '';
-    document.getElementById('searchCountry').value = '';
-    document.getElementById('searchCity').value = '';
-    document.getElementById('searchState').value = '';
-    document.getElementById('searchRanking').value = '';
-    filterTable(); // Call filterTable to apply the cleared filters
+  document.getElementById('globalSearch').value = '';
+  document.getElementById('filterHiringStatus').value = '';
+  document.getElementById('filterContactMethod').value = '';
+  document.getElementById('filterProgram').value = '';
+  document.getElementById('filterResearchArea').value = '';
+  document.getElementById('filterTitle').value = '';
+  document.getElementById('filterUniversity').value = '';
+  document.getElementById('filterDepartment').value = '';
+  document.getElementById('sortBy').value = '';
+  filterTable();
 }
+
+// --- wire up live filtering ---
+document.getElementById('globalSearch').addEventListener('input', debounce(filterTable, 200));
+document.getElementById('filterHiringStatus').addEventListener('change', filterTable);
+document.getElementById('filterContactMethod').addEventListener('change', filterTable);
+document.getElementById('filterProgram').addEventListener('input', debounce(filterTable, 200));
+document.getElementById('filterResearchArea').addEventListener('input', debounce(filterTable, 200));
+document.getElementById('filterTitle').addEventListener('input', debounce(filterTable, 200));
+document.getElementById('filterUniversity').addEventListener('input', debounce(filterTable, 200));
+document.getElementById('filterDepartment').addEventListener('input', debounce(filterTable, 200));
+document.getElementById('sortBy').addEventListener('change', filterTable);
+
+// Initial run (optional)
+document.addEventListener('DOMContentLoaded', filterTable);
