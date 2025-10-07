@@ -1,30 +1,34 @@
+:root {
+  --bs-primary: #d8b4da;
+}
+
 body {
-    background-color: #f8f9fa;
+  background-color: #f8f9fa;
 }
 
 .card {
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-    border: 1px solid rgba(0, 0, 0, 0.125);
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  border: 1px solid rgba(0, 0, 0, 0.125);
 }
 
 .table th {
-    border-top: none;
-    font-weight: 600;
+  border-top: none;
+  font-weight: 600;
 }
 
 .badge {
-    font-size: 0.8em;
+  font-size: 0.8em;
 }
 
 .hidden {
-    display: none;
+  display: none;
 }
 
 .navbar-brand {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .card-header {
-    background-color: #f8f9fa;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+  background-color: #f8f9fa;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
 }

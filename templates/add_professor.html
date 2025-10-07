@@ -2,31 +2,144 @@
 
 {% block content %}
 <div class="row">
-    <div class="col-md-6 offset-md-3">
-        <h2>Add Professor</h2>
-        <form method="POST">
+    <div class="col-md-8 offset-md-2">
+        {% if professor %}
+            <h2>Edit Professor</h2>
+            <form method="POST">
+                <input type="hidden" name="professor_id" value="{{ professor.id }}"> <!-- Hidden field for ID -->
+        {% else %}
+            <h2>Add Professor</h2>
+            <form method="POST">
+        {% endif %}
+
             <div class="mb-3">
-                <label for="name" class="form-label">Name</label>
-                <input type="text" class="form-control" id="name" name="name" required>
+                <label for="name" class="form-label">Professor Name</label>
+                <input type="text" class="form-control" id="name" name="name" value="{{ professor.name if professor else '' }}" required>
             </div>
+
             <div class="mb-3">
-                <label for="university" class="form-label">University</label>
-                <input type="text" class="form-control" id="university" name="university" required>
+                <label for="university_name" class="form-label">University</label>
+                <div class="input-group">
+                    <select class="form-control" id="university_id" name="university_id" {% if professor %}disabled{% endif %}>
+                        <option value="">Select existing or type new</option>
+                        {% for uni in universities %}
+                        <option value="{{ uni.id }}" {% if professor and uni.name == professor.university.name %}selected{% endif %}>{{ uni.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="text" class="form-control" id="university_name" name="university_name" value="{{ professor.university.name if professor else '' }}" placeholder="Or type new university" {% if professor %}required{% endif %}>
+                </div>
             </div>
+
+            <!-- University Location Details -->
             <div class="mb-3">
-                <label for="department" class="form-label">Department</label>
-                <input type="text" class="form-control" id="department" name="department" required>
+                <label for="university_country" class="form-label">University Country</label>
+                <input type="text" class="form-control" id="university_country" name="university_country" value="{{ professor.university.country if professor and professor.university else '' }}" placeholder="e.g., United States">
             </div>
+
             <div class="mb-3">
-                <label for="research_area" class="form-label">Research Area</label>
-                <input type="text" class="form-control" id="research_area" name="research_area">
+                <label for="university_state" class="form-label">University State/Province</label>
+                <input type="text" class="form-control" id="university_state" name="university_state" value="{{ professor.university.state if professor and professor.university else '' }}" placeholder="e.g., California">
             </div>
+
+            <div class="mb-3">
+                <label for="university_city" class="form-label">University City</label>
+                <input type="text" class="form-control" id="university_city" name="university_city" value="{{ professor.university.city if professor and professor.university else '' }}" placeholder="e.g., Berkeley">
+            </div>
+
+            <div class="mb-3">
+                <label for="university_ranking" class="form-label">University Ranking (US News)</label>
+                <input type="number" class="form-control" id="university_ranking" name="university_ranking" value="{{ professor.university.ranking_usnews if professor and professor.university and professor.university.ranking_usnews else '' }}" placeholder="e.g., 10">
+            </div>
+
+            <div class="mb-3">
+                <label for="department_name" class="form-label">Department</label>
+                <div class="input-group">
+                    <select class="form-control" id="department_id" name="department_id" {% if professor %}disabled{% endif %}>
+                        <option value="">Select existing or type new</option>
+                        {% for dept in departments %}
+                        <option value="{{ dept.id }}" {% if professor and dept.name == professor.department.name %}selected{% endif %}>{{ dept.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="text" class="form-control" id="department_name" name="department_name" value="{{ professor.department.name if professor else '' }}" placeholder="Or type new department" {% if professor %}required{% endif %}>
+                </div>
+            </div>
+
             <div class="mb-3">
                 <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" name="email" required>
+                <input type="email" class="form-control" id="email" name="email" value="{{ professor.email if professor else '' }}" required>
             </div>
-            <button type="submit" class="btn btn-primary">Add Professor</button>
-            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Cancel</a>
+
+            <div class="mb-3">
+                <label for="program_names" class="form-label">Programs (Multiple - Enter comma-separated)</label>
+                <div class="input-group">
+                    <select multiple class="form-control" id="program_ids" name="program_ids" {% if professor %}disabled{% endif %}>
+                        {% for prog in programs %}
+                        <option value="{{ prog.id }}" {% if professor and prog.name in professor.programs|map(attribute='name') %}selected{% endif %}>{{ prog.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="text" class="form-control" id="program_names" name="program_names" value="{{ professor.programs|map(attribute='name')|join(', ') if professor else '' }}" placeholder="Or type new programs (comma-separated)" {% if professor %}required{% endif %}>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="research_area_names" class="form-label">Research Areas (Multiple - Enter comma-separated)</label>
+                <div class="input-group">
+                    <select multiple class="form-control" id="research_area_ids" name="research_area_ids" {% if professor %}disabled{% endif %}>
+                        {% for area in research_areas %}
+                        <option value="{{ area.id }}" {% if professor and area.name in professor.research_areas|map(attribute='name') %}selected{% endif %}>{{ area.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="text" class="form-control" id="research_area_names" name="research_area_names" value="{{ professor.research_areas|map(attribute='name')|join(', ') if professor else '' }}" placeholder="Or type new research areas (comma-separated)" {% if professor %}required{% endif %}>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label for="hiring_status" class="form-label">Hiring Status</label>
+                <select class="form-control" id="hiring_status" name="hiring_status" required>
+                    {% for status in hiring_statuses %}
+                    <option value="{{ status.value }}" {% if professor and professor.hiring_status.value == status.value %}selected{% endif %}>{{ status.value }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="contact_through" class="form-label">Contact Through</label>
+                <select class="form-control" id="contact_through" name="contact_through" required>
+                    {% for method in contact_methods %}
+                    <option value="{{ method.value }}" {% if professor and professor.contact_through.value == method.value %}selected{% endif %}>{{ method.value }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="personal_website" class="form-label">Personal Website</label>
+                <input type="url" class="form-control" id="personal_website" name="personal_website" value="{{ professor.personal_website if professor else '' }}">
+            </div>
+
+            <div class="mb-3">
+                <label for="lab_group_name" class="form-label">Lab Group Name</label>
+                <input type="text" class="form-control" id="lab_group_name" name="lab_group_name" value="{{ professor.lab_group_name if professor else '' }}">
+            </div>
+
+            <div class="mb-3">
+                <label for="lab_website" class="form-label">Lab Website</label>
+                <input type="url" class="form-control" id="lab_website" name="lab_website" value="{{ professor.lab_website if professor else '' }}">
+            </div>
+
+            <div class="mb-3">
+                <label for="form_link" class="form-label">Form Link</label>
+                <input type="url" class="form-control" id="form_link" name="form_link" value="{{ professor.form_link if professor else '' }}">
+            </div>
+
+            <div class="mb-3">
+                <label for="notes" class="form-label">Notes</label>
+                <textarea class="form-control" id="notes" name="notes" rows="3">{{ professor.notes if professor else '' }}</textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                {% if professor %}Update Professor{% else %}Add Professor{% endif %}
+            </button>
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancel</a>
         </form>
     </div>
 </div>
