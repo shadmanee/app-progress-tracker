@@ -449,3 +449,34 @@ body {
     padding: 0.15em 0.3em;
   }
 }
+
+/* Add after Bootstrap */
+.search-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 992px) { /* lg */
+  .search-grid {
+    grid-template-columns: 1.5fr 1fr 1fr 1fr; /* search wider, three equal filters */
+  }
+}
+/* Fix B for Advanced filters: evenly packed, responsive columns */
+.advanced-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr; /* stack on small screens */
+}
+
+/* Use auto-fit so items fill the row without leaving gaps.
+   minmax ensures nice min width and then each grows to 1fr. */
+@media (min-width: 576px) {  /* sm */
+  .advanced-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  }
+}
+
+.form-select {
+    padding-right: 2rem; /* Adjust the value (e.g., 1.5rem, 2rem) as needed */
+    /* Keep other existing styles for .form-select */
+}
