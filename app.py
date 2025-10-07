@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_migrate import Migrate
+from sqlalchemy.orm import joinedload
 from models import db, Professor, University, Department, Program, ResearchArea
 from models import HiringStatus, ContactThrough
 
@@ -239,6 +240,19 @@ def delete_professor(professor_id):
     except Exception as e:
         db.session.rollback()
         return {'error': str(e)}, 500
+
+@app.route('/programs')
+def programs_list():
+    programs = (
+        Program.query
+        .options(
+            joinedload(Program.department).joinedload(Department.university)
+        )
+        .join(Department).join(University)
+        .order_by(University.name.asc(), Department.name.asc(), Program.name.asc())
+        .all()
+    )
+    return render_template("programs_list.html", programs=programs)
     
 if __name__ == '__main__':
     with app.app_context():

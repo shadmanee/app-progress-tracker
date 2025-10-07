@@ -53,7 +53,7 @@ function deleteProfessor(professorId) {
 }
 
 // Confirm deletion when the confirm button is clicked
-document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+document.getElementById('confirmDeleteBtn')?.addEventListener('click', function() { // Optional chaining
     if (professorToDelete !== null) {
         // Send a DELETE request to the server
         fetch(`/delete_professor/${professorToDelete}`, {
@@ -69,7 +69,7 @@ document.getElementById('confirmDeleteBtn').addEventListener('click', function()
                 if (row) {
                     row.remove();
                 }
-                
+
                 // Hide the modal
                 const modal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
                 modal.hide();
@@ -99,9 +99,16 @@ function debounce(fn, delay = 250) {
     t = setTimeout(() => fn(...args), delay);
   };
 }
+const toNum = (v, fallback = NaN) => {
+  const n = Number(v); return Number.isFinite(n) ? n : fallback;
+};
 
 // --- core filtering ---
 function filterTable() {
+  // Check if professor table exists before running this function
+  const profTable = document.getElementById('professorTable');
+  if (!profTable) return; // Exit if not on the professor page
+
   // Search only these fields:
   // name + location (country, city, state)
   const tokens = tokenize(document.getElementById('globalSearch').value);
@@ -155,6 +162,10 @@ function filterTable() {
 
 // --- sorting ---
 function sortRows() {
+  // Check if professor table exists before running this function
+  const profTable = document.getElementById('professorTable');
+  if (!profTable) return; // Exit if not on the professor page
+
   const sortBy = document.getElementById('sortBy').value;
   if (!sortBy) return;
 
@@ -185,6 +196,10 @@ function sortRows() {
 
 // --- clear ---
 function clearFilters() {
+  // Check if professor table exists before running this function
+  const profTable = document.getElementById('professorTable');
+  if (!profTable) return; // Exit if not on the professor page
+
   document.getElementById('globalSearch').value = '';
   document.getElementById('filterHiringStatus').value = '';
   document.getElementById('filterContactMethod').value = '';
@@ -198,15 +213,20 @@ function clearFilters() {
 }
 
 // --- wire up live filtering ---
-document.getElementById('globalSearch').addEventListener('input', debounce(filterTable, 200));
-document.getElementById('filterHiringStatus').addEventListener('change', filterTable);
-document.getElementById('filterContactMethod').addEventListener('change', filterTable);
-document.getElementById('filterProgram').addEventListener('input', debounce(filterTable, 200));
-document.getElementById('filterResearchArea').addEventListener('input', debounce(filterTable, 200));
-document.getElementById('filterTitle').addEventListener('input', debounce(filterTable, 200));
-document.getElementById('filterUniversity').addEventListener('input', debounce(filterTable, 200));
-document.getElementById('filterDepartment').addEventListener('input', debounce(filterTable, 200));
-document.getElementById('sortBy').addEventListener('change', filterTable);
+// Add checks before attaching listeners
+document.getElementById('globalSearch')?.addEventListener('input', debounce(filterTable, 200));
+document.getElementById('filterHiringStatus')?.addEventListener('change', filterTable);
+document.getElementById('filterContactMethod')?.addEventListener('change', filterTable);
+document.getElementById('filterProgram')?.addEventListener('input', debounce(filterTable, 200));
+document.getElementById('filterResearchArea')?.addEventListener('input', debounce(filterTable, 200));
+document.getElementById('filterTitle')?.addEventListener('input', debounce(filterTable, 200));
+document.getElementById('filterUniversity')?.addEventListener('input', debounce(filterTable, 200));
+document.getElementById('filterDepartment')?.addEventListener('input', debounce(filterTable, 200));
+document.getElementById('sortBy')?.addEventListener('change', filterTable);
 
-// Initial run (optional)
-document.addEventListener('DOMContentLoaded', filterTable);
+// Initial run (optional) - also add check
+document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('professorTable')) {
+        filterTable();
+    }
+});

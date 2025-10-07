@@ -12,9 +12,16 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
             <a class="navbar-brand" href="{{ url_for('index') }}">PhD Application Tracker</a>
-            <!-- <div class="navbar-nav">
-                <a class="nav-link" href="{{ url_for('add_professor') }}">Add Professor</a>
-            </div> -->
+            <div class="navbar-nav">
+                {# Show different CTA based on the current page #}
+                {% if request.endpoint in ['programs_list', 'programs.programs_list'] %}
+                    <a class="nav-link" href="{{ url_for('index') }}">Browse Professors</a>
+                {% elif request.endpoint in ['add_professor'] %}
+                    <a class="nav-link" href="{{ url_for('programs_list') }}">Browse Programs</a>
+                {% else %}
+                    <a class="nav-link" href="{{ url_for('programs_list') }}">Browse Programs</a>
+                {% endif %}
+            </div>
         </div>
     </nav>
 
@@ -23,6 +30,5 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
