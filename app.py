@@ -39,6 +39,7 @@ def get_professor(professor_id):
     data = {
         'id': professor.id,
         'name': professor.name,
+        'title': professor.title,
         'university_name': professor.university.name if professor.university else '',
         'university_country': professor.university.country if professor.university else '',
         'university_state': professor.university.state if professor.university else '',
@@ -78,6 +79,7 @@ def add_professor():
             professor = Professor.query.get_or_404(int(professor_id))
             # Update existing professor's fields
             professor.name = request.form['name']
+            professor.title = request.form['title']
             # Handle university update - for simplicity, we'll recreate the university if name changes
             # In a real app, you might want a more sophisticated approach
             if request.form.get('university_name') != professor.university.name:
@@ -165,6 +167,7 @@ def add_professor():
             # Create professor
             professor = Professor(
                 name=request.form['name'],
+                title=request.form['title'],
                 university_id=university_id,
                 department_id=department_id,
                 email=request.form['email'],

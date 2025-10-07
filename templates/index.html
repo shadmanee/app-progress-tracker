@@ -4,9 +4,7 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Professor List</h1>
     <a href="{{ url_for('add_professor') }}" class="btn btn-primary" title="Add professor" aria-label="Add professor">
-    <svg width="16" height="16" viewBox="0 0 16 16" role="img" aria-hidden="true">
-        <path d="M8 1a1 1 0 0 1 1 1v5h5a1 1 0 1 1 0 2H9v5a1 1 0 1 1-2 0V9H2a1 1 0 1 1 0-2h5V2a1 1 0 0 1 1-1z"/>
-    </svg>
+    <i class="bi bi-plus-lg" aria-hidden="true"></i> Add Professor
     <span class="visually-hidden">Add professor</span>
     </a>
 </div>
@@ -74,22 +72,24 @@
 <table class="table table-striped" id="professorTable">
     <thead>
         <tr>
-            <th>Rank</th>
             <th>Name</th>
+            <th>Title</th>
             <th>University</th>
+            <th>University Rank (US News)</th>
             <th>Location</th>
             <th>Department</th>
-            <th>Programs</th>
+            <!-- <th>Programs</th> -->
             <th>Research Areas</th>
-            <th>Email</th>
+            <!-- <th>Email</th> -->
             <th>Hiring Status</th>
-            <th>Contact Method</th>
+            <!-- <th>Contact Method</th> -->
             <th>Actions</th>
         </tr>
     </thead>
     <tbody>
         {% for prof in professors %}
         <tr data-name="{{ prof.name|lower }}" 
+            data-title="{{ prof.title|lower }}"
             data-university="{{ prof.university.name|lower if prof.university else '' }}" 
             data-department="{{ prof.department.name|lower if prof.department else '' }}"
             data-hiring-status="{{ prof.hiring_status.value|lower }}"
@@ -99,9 +99,10 @@
             data-city="{{ prof.university.city|lower if prof.university else '' }}"
             data-state="{{ prof.university.state|lower if prof.university else '' }}"
             data-ranking="{{ prof.university.ranking_usnews|string if prof.university and prof.university.ranking_usnews else '' }}">
-            <td>{{ prof.university.ranking_usnews }}</td>
             <td>{{ prof.name }}</td>
+            <td>{{ prof.title }}</td>
             <td>{{ prof.university.name if prof.university else 'N/A' }}</td>
+            <td>{{ prof.university.ranking_usnews }}</td>
             <td>
                 {% if prof.university %}
                     {% if prof.university.city %}{{ prof.university.city }}{% endif %}{% if prof.university.state %}, {{ prof.university.state }}{% endif %}{% if prof.university.country %}, {{ prof.university.country }}{% endif %}
@@ -110,17 +111,17 @@
                 {% endif %}
             </td>
             <td>{{ prof.department.name if prof.department else 'N/A' }}</td>
-            <td class="programs-cell" data-programs="{{ prof.programs|map(attribute='name')|join(',')|lower }}">
+            <!-- <td class="programs-cell" data-programs="{{ prof.programs|map(attribute='name')|join(',')|lower }}">
                 {% for prog in prof.programs %}
                     <span class="badge bg-secondary me-1">{{ prog.name }}</span>
                 {% endfor %}
-            </td>
+            </td> -->
             <td class="research-areas-cell" data-research-areas="{{ prof.research_areas|map(attribute='name')|join(',')|lower }}">
                 {% for area in prof.research_areas %}
                     <span class="badge bg-info me-1">{{ area.name }}</span>
                 {% endfor %}
             </td>
-            <td>{{ prof.email }}</td>
+            <!-- <td>{{ prof.email }}</td> -->
             <td>
                 <span class="badge 
                     {% if prof.hiring_status.value == 'Hiring' %}bg-success
@@ -130,7 +131,7 @@
                     {{ prof.hiring_status.value }}
                 </span>
             </td>
-            <td>{{ prof.contact_through.value }}</td>
+            <!-- <td>{{ prof.contact_through.value }}</td> -->
             <td>
                 <button class="btn btn-sm btn-outline-primary me-1" onclick="editProfessor({{ prof.id }})">
                     Edit

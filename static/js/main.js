@@ -17,6 +17,7 @@ function editProfessor(professorId) {
             const params = new URLSearchParams();
             params.append('id', data.id);
             params.append('name', data.name);
+            params.append('title', data.title);
             params.append('university_name', data.university_name);
             params.append('university_country', data.university_country);
             params.append('university_state', data.university_state);

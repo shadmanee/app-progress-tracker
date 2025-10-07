@@ -1,34 +1,451 @@
+/* static/css/style.css */
+
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+/* Cute Pastel Color Palette */
 :root {
-  --bs-primary: #d8b4da;
+  --primary-color: #a8dadc; /* Soft blue */
+  --primary-dark: #457b9d; /* Deeper blue */
+  --secondary-color: #f1faee; /* Off-white */
+  --accent-color: #f4a261; /* Soft orange */
+  --accent-light: #f8c490; /* Lighter orange */
+  --success-color: #90e0ef; /* Light blue */
+  --danger-color: #e76f51; /* Coral */
+  --warning-color: #fcbf49; /* Yellow */
+  --text-dark: #212529; /* Standard dark - good contrast */
+  --text-light: #f8f9fa; /* Standard light - good contrast */
+  --text-accent: #e63946; /* A cute red for emphasis */
+  --border-color: #d9e2ec; /* Light gray-blue */
+  --card-bg: #ffffff; /* Pure white - good contrast */
+  --table-hover: #f8fffb; /* Very light off-white for hover */
+  --shadow-color: rgba(168, 218, 220, 0.3); /* Soft blue shadow */
+  --gradient-start: #e9f5db;
+  --gradient-end: #a8dadc;
+  --font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* A modern, cute font stack */
+  /* Smaller size variables */
+  --font-size-sm: 0.8rem;
+  --font-size-base: 0.85rem;
+  --font-size-lg: 1rem;
+  --padding-sm: 0.25rem 0.5rem;
+  --padding-base: 0.375rem 0.75rem;
+  --padding-lg: 0.5rem 1rem;
+  --border-radius-sm: 6px;
+  --border-radius-base: 8px;
+  --border-radius-lg: 12px;
+  --border-radius-xl: 16px;
 }
 
+/* General Body and Container Styles */
 body {
-  background-color: #f8f9fa;
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  color: var(--text-dark);
+  padding-bottom: 40px;
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+  line-height: 1.5; /* Improve readability */
 }
 
-.card {
-  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-  border: 1px solid rgba(0, 0, 0, 0.125);
+.container {
+  max-width: 1200px;
 }
 
-.table th {
-  border-top: none;
-  font-weight: 600;
-}
-
-.badge {
-  font-size: 0.8em;
-}
-
-.hidden {
-  display: none;
+/* Navbar Styles */
+.navbar {
+  margin-bottom: 1.5rem;
+  box-shadow: 0 3px 5px var(--shadow-color);
+  background-color: var(--primary-color) !important;
+  overflow: hidden;
+  padding: 0.5rem 1rem;
 }
 
 .navbar-brand {
-  font-weight: bold;
+  font-weight: 600;
+  font-size: var(--font-size-lg);
+  color: var(--text-light) !important;
+  font-family: var(--font-family);
+}
+
+.navbar-nav .nav-link {
+  color: var(--text-light) !important;
+  transition: color 0.2s ease;
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  padding: 0.25rem 0.5rem;
+}
+
+.navbar-nav .nav-link:hover {
+  color: var(--secondary-color) !important;
+}
+
+/* Card Styles */
+.card {
+  box-shadow: 0 4px 8px var(--shadow-color);
+  border: none;
+  border-radius: var(--border-radius-xl);
+  background-color: var(--card-bg);
+  margin-bottom: 1.25rem;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  font-size: var(--font-size-base);
+}
+
+.card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px var(--shadow-color);
 }
 
 .card-header {
-  background-color: #f8f9fa;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+  background: linear-gradient(to right, var(--primary-color), var(--primary-dark));
+  color: var(--text-light);
+  border: none;
+  font-weight: 500;
+  padding: 0.75rem 1rem;
+  border-radius: calc(var(--border-radius-xl) - 1px) calc(var(--border-radius-xl) - 1px) 0 0 !important;
+  font-family: var(--font-family);
+  font-size: var(--font-size-lg);
+}
+
+/* Table Styles */
+.table-container {
+  overflow-x: auto;
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1rem;
+}
+
+.table {
+  background-color: var(--card-bg);
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  min-width: 700px;
+  font-family: var(--font-family);
+  font-size: var(--font-size-sm);
+  table-layout: fixed;
+}
+
+.table th {
+  background-color: var(--primary-color);
+  color: var(--text-dark);
+  font-weight: 600;
+  padding: 0.6rem;
+  border: none;
+  text-align: left;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.table td {
+  padding: 0.5rem 0.6rem;
+  border: none;
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+  word-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Badge Styles within table cells */
+.table td .badge {
+  margin-right: 0.15rem;
+  font-size: 0.65em;
+  white-space: normal;
+  display: inline-block;
+  padding: 0.2em 0.4em;
+  font-weight: 500; /* Ensure badge text is bold for cuteness */
+  letter-spacing: 0.02em; /* Consistent letter spacing */
+  text-transform: uppercase; /* Consistent text transform */
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table tbody tr:hover {
+  background-color: var(--table-hover);
+}
+
+/* Badge Styles (general, outside table context) */
+.badge {
+  font-size: 0.7em;
+  font-weight: 500; /* Ensure consistent weight */
+  padding: 0.25em 0.5em;
+  border-radius: 50px;
+  text-transform: uppercase; /* Consistent text transform */
+  letter-spacing: 0.02em; /* Consistent letter spacing */
+  margin-right: 0.15rem;
+  white-space: normal;
+  display: inline-block;
+}
+
+/* Specific Badge Color Overrides - MAKE THESE RULES MORE SPECIFIC */
+.badge.bg-success {
+  background-color: var(--success-color) !important;
+  color: var(--text-dark) !important;
+}
+
+.badge.bg-danger {
+  background-color: var(--danger-color) !important;
+  color: var(--text-light) !important;
+}
+
+.badge.bg-warning {
+  background-color: var(--warning-color) !important;
+  color: var(--text-dark) !important;
+}
+
+.badge.bg-secondary {
+  background-color: var(--primary-color) !important;
+  color: var(--text-dark) !important;
+}
+
+.badge.bg-info {
+  background-color: var(--accent-color) !important;
+  color: var(--text-light) !important;
+}
+
+/* Button Styles */
+.btn {
+  font-family: var(--font-family);
+  font-weight: 500;
+  border-radius: 50px;
+  transition: all 0.2s ease-in-out;
+  padding: var(--padding-sm);
+  border: 1.5px solid transparent;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  font-size: var(--font-size-sm);
+}
+
+.btn-sm {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 40px;
+}
+
+.btn-primary {
+  background-color: var(--primary-dark);
+  border-color: var(--primary-dark);
+  color: var(--text-light);
+}
+
+.btn-primary:hover, .btn-primary:focus, .btn-primary:active {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: var(--text-dark);
+  box-shadow: 0 0 0 0.15rem rgba(168, 218, 220, 0.5);
+}
+
+.btn-secondary {
+  background-color: var(--secondary-color);
+  border-color: var(--secondary-color);
+  color: var(--text-dark);
+}
+
+.btn-secondary:hover, .btn-secondary:focus, .btn-secondary:active {
+  background-color: #e2f0e1;
+  border-color: #e2f0e1;
+  color: var(--text-dark);
+}
+
+.btn-outline-primary {
+  color: var(--primary-dark);
+  border-color: var(--primary-dark);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--primary-dark);
+  border-color: var(--primary-dark);
+  color: var(--text-light);
+}
+
+.btn-outline-danger {
+  color: var(--danger-color);
+  border-color: var(--danger-color);
+}
+
+.btn-outline-danger:hover {
+  background-color: var(--danger-color);
+  border-color: var(--danger-color);
+  color: var(--text-light);
+}
+
+.btn-outline-secondary {
+  color: var(--primary-dark);
+  border-color: var(--primary-dark);
+}
+
+.btn-outline-secondary:hover {
+  background-color: var(--primary-dark);
+  border-color: var(--primary-dark);
+  color: var(--text-light);
+}
+
+/* Form Styles */
+.form-control, .form-select {
+  border-radius: var(--border-radius-base);
+  border: 1.5px solid var(--border-color);
+  padding: var(--padding-sm);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  line-height: 1.5; /* Improve readability inside forms */
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 0.15rem rgba(168, 218, 220, 0.25);
+  outline: 0;
+}
+
+.input-group > .form-control,
+.input-group > .form-select,
+.input-group > .btn {
+  border-radius: var(--border-radius-base);
+}
+
+.input-group > .form-control:not(:first-child),
+.input-group > .form-select:not(:first-child),
+.input-group > .btn:not(:first-child) {
+  border-left: 0;
+}
+
+.input-group > .form-control:first-child,
+.input-group > .form-select:first-child,
+.input-group > .btn:first-child {
+  border-right: 0;
+}
+
+/* Modal Styles */
+.modal-content {
+  border-radius: var(--border-radius-xl);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  border: none;
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+}
+
+.modal-header {
+  background: linear-gradient(to right, var(--primary-color), var(--primary-dark));
+  color: var(--text-light);
+  border-bottom: none;
+  border-radius: calc(var(--border-radius-xl) - 1px) calc(var(--border-radius-xl) - 1px) 0 0;
+  padding: 0.75rem 1.25rem;
+}
+
+.modal-title {
+  font-weight: 600;
+  font-size: var(--font-size-lg);
+}
+
+.modal-body {
+  padding: 1.25rem;
+}
+
+.modal-footer {
+  border-top: 1px solid var(--border-color);
+  padding: 0.75rem 1.25rem;
+  border-radius: 0 0 calc(var(--border-radius-xl) - 1px) calc(var(--border-radius-xl) - 1px);
+  background-color: var(--secondary-color);
+}
+
+/* Utility Classes & Responsive Adjustments */
+.d-flex {
+  display: flex;
+}
+
+.justify-content-between {
+  justify-content: space-between;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+.mb-4 {
+  margin-bottom: 1.25rem;
+}
+
+.mt-4 {
+  margin-top: 1.25rem;
+}
+
+.mt-2 {
+  margin-top: 0.5rem;
+}
+
+.g-3 {
+  gap: 0.75rem;
+}
+
+.me-1 {
+  margin-right: 0.15rem;
+}
+
+/* Responsive Adjustments for smaller screens */
+@media (max-width: 768px) {
+  .container {
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+  }
+
+  .card {
+    margin-left: 0.25rem;
+    margin-right: 0.25rem;
+  }
+
+  .col-md-2, .col-md-3, .col-md-4, .col-md-6, .col-md-8 {
+    width: 100%;
+    margin-bottom: 0.25rem;
+  }
+
+  .input-group {
+    flex-direction: column;
+  }
+
+  .input-group > .form-control,
+  .input-group > .form-select,
+  .input-group > .btn {
+    border-radius: var(--border-radius-base);
+    width: 100%;
+  }
+
+  .input-group > .form-control:not(:first-child),
+  .input-group > .form-select:not(:first-child),
+  .input-group > .btn:not(:first-child) {
+    border-top: 0;
+    margin-top: -1px;
+  }
+
+  .input-group > .form-control:first-child,
+  .input-group > .form-select:first-child,
+  .input-group > .btn:first-child {
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+  }
+
+  .input-group > .form-control:last-child,
+  .input-group > .form-select:last-child,
+  .input-group > .btn:last-child {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+  }
+
+  .table-container {
+    font-size: 0.75rem;
+  }
+
+  .table th,
+  .table td {
+    padding: 0.35rem 0.5rem;
+  }
+
+  .table td:nth-child(4) .badge,
+  .table td:nth-child(5) .badge {
+    font-size: 0.55em;
+    padding: 0.15em 0.3em;
+  }
 }
