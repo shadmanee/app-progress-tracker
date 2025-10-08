@@ -1,0 +1,113 @@
+<!-- templates/programs_list.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<!-- ... (your existing HTML content remains the same) ... -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Programs List</h1>
+    <a href="{{ url_for('index') }}" class="btn btn-outline-primary" title="Back to Professors" aria-label="Back to Professors">
+        <i class="bi bi-arrow-left" aria-hidden="true"></i> Back to Professors
+        <span class="visually-hidden">Back to Professors</span>
+    </a>
+</div>
+
+<!-- Search and Filter Section
+<div class="card mb-4">
+  <div class="card-body">
+    <div class="d-flex flex-wrap align-items-center gap-2 justify-content-between">
+      <h5 class="mb-0">Find Programs</h5>
+      <div class="d-flex gap-2">
+        <select class="form-select form-select-sm" id="sortBy" aria-label="Sort by">
+          <option value="">Sort by…</option>
+          <option value="program-asc">Program (A→Z)</option>
+          <option value="program-desc">Program (Z→A)</option>
+          <option value="department-asc">Department (A→Z)</option>
+          <option value="department-desc">Department (Z→A)</option>
+          <option value="university-asc">University (A→Z)</option>
+          <option value="university-desc">University (Z→A)</option>
+          <option value="professors-asc">Professors (Low→High)</option>
+          <option value="professors-desc">Professors (High→Low)</option>
+          <option value="ranking-asc">Ranking (Low→High)</option>
+          <option value="ranking-desc">Ranking (High→Low)</option>
+        </select>
+        <button class="btn btn-outline-secondary btn-sm" onclick="clearProgramFilters()">Clear</button>
+      </div>
+    </div>
+
+    Primary search row: name/location + key filters
+    <div class="mt-3">
+        <div class="search-grid">
+            <input type="text" class="form-control" id="programSearch"
+                placeholder="Search by program, dept, uni, or location…" aria-label="Search by program, department, university, or location">
+
+            <input type="text" class="form-control" id="filterProgram" placeholder="Filter by program name…">
+            <input type="text" class="form-control" id="filterDepartment" placeholder="Filter by department…">
+            <input type="text" class="form-control" id="filterUniversity" placeholder="Filter by university…">
+        </div>
+    </div>
+
+    <div class="mt-2">
+    <button class="btn btn-link p-0" type="button" data-bs-toggle="collapse" data-bs-target="#advancedProgramFilters" aria-expanded="false">
+        Advanced filters
+    </button>
+
+    <div class="collapse" id="advancedProgramFilters">
+        <div class="advanced-grid mt-1">
+            <input type="text" class="form-control" id="filterCountry" placeholder="Filter by country…">
+            <input type="text" class="form-control" id="filterState" placeholder="Filter by state/province…">
+            <input type="text" class="form-control" id="filterCity" placeholder="Filter by city…">
+            <input type="number" class="form-control" id="filterRankingMin" placeholder="Min Ranking" min="0">
+            <input type="number" class="form-control" id="filterRankingMax" placeholder="Max Ranking" min="0">
+            <input type="number" class="form-control" id="filterProfMin" placeholder="Min Professors" min="0">
+            <input type="number" class="form-control" id="filterProfMax" placeholder="Max Professors" min="0">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="filterHasProfessors">
+                <label class="form-check-label" for="filterHasProfessors">
+                    Has Professors
+                </label>
+            </div>
+        </div>
+    </div>
+    </div>
+  </div>
+</div> -->
+
+<!-- Table Container (Ensures horizontal scrolling if needed) -->
+<div class="table-container">
+    <table class="table table-striped" id="programsTable">
+        <thead>
+            <tr>
+                <th scope="col" class="text-center">Department</th>
+                <th scope="col" class="text-center">University</th>
+                <th scope="col" class="text-center">Location</th>
+                <th scope="col" class="text-center">Program</th>
+                <th scope="col" class="text-center">Professors</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for program in programs %}
+            {% set dept = program.department %}
+            {% set uni = dept.university %}
+            {% set prof_count = program.professors|length %}
+            <tr
+                data-program="{{ program.name|lower }}"
+                data-department="{{ dept.name|lower }}"
+                data-university="{{ uni.name|lower }}"
+                data-country="{{ uni.country|lower }}"
+                data-state="{{ (uni.state or '')|lower }}"
+                data-city="{{ uni.city|lower }}"
+                data-location="{{ (uni.city ~ ' ' ~ (uni.state or '') ~ ' ' ~ uni.country)|lower }}"
+                data-ranking="{{ uni.ranking_usnews or '' }}"
+                data-professors="{{ prof_count }}"
+            >
+                <td>{{ dept.name }}</td>
+                <td>{{ uni.name }}</td>
+                <td>{{ uni.city }}{% if uni.state %}, {{ uni.state }}{% endif %}{% if uni.country %}, {{ uni.country }}{% endif %}</td>
+                <td>{{ program.name }}</td>
+                <td class="text-center">{{ prof_count }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
