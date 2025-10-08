@@ -7,6 +7,15 @@
   // --- utils ---
   const normalize = (s) => (s || "").toString().toLowerCase().trim().replace(/\s+/g, " ");
   const tokenize = (s) => normalize(s).split(" ").filter(Boolean);
+  const readNumber = (row, attr) => {
+    const value = (row.getAttribute(attr) || "").trim();
+    if (!value) {
+      return null;
+    }
+
+    const numeric = Number.parseFloat(value);
+    return Number.isFinite(numeric) ? numeric : null;
+  };
 
   // Simple debounce for input typing
   function debounce(fn, delay = 250) {
@@ -195,6 +204,189 @@
     filterTable();
   }
 
+  // --- program filtering ---
+  function filterPrograms() {
+    const table = getById('programsTable');
+    if (!table) {
+      return;
+    }
+
+    const tbody = table.querySelector('tbody');
+    if (!tbody) {
+      return;
+    }
+
+    const tokens = tokenize(getById('programGlobalSearch')?.value || '');
+    const programFilter = normalize(getById('programFilterName')?.value);
+    const departmentFilter = normalize(getById('programFilterDepartment')?.value);
+    const universityFilter = normalize(getById('programFilterUniversity')?.value);
+    const countryFilter = normalize(getById('programFilterCountry')?.value);
+    const stateFilter = normalize(getById('programFilterState')?.value);
+    const cityFilter = normalize(getById('programFilterCity')?.value);
+
+    const rankingMinValue = getById('programFilterRankingMin')?.value;
+    const rankingMaxValue = getById('programFilterRankingMax')?.value;
+    const profMinValue = getById('programFilterProfMin')?.value;
+    const profMaxValue = getById('programFilterProfMax')?.value;
+
+    const rankingMin = rankingMinValue ? Number.parseFloat(rankingMinValue) : null;
+    const rankingMax = rankingMaxValue ? Number.parseFloat(rankingMaxValue) : null;
+    const profMin = profMinValue ? Number.parseFloat(profMinValue) : null;
+    const profMax = profMaxValue ? Number.parseFloat(profMaxValue) : null;
+    const hasProfessors = Boolean(getById('programFilterHasProfessors')?.checked);
+
+    const rows = tbody.querySelectorAll('tr');
+
+    rows.forEach((row) => {
+      const program = normalize(row.getAttribute('data-program'));
+      const department = normalize(row.getAttribute('data-department'));
+      const university = normalize(row.getAttribute('data-university'));
+      const country = normalize(row.getAttribute('data-country'));
+      const state = normalize(row.getAttribute('data-state'));
+      const city = normalize(row.getAttribute('data-city'));
+      const location = normalize(row.getAttribute('data-location'));
+      const ranking = readNumber(row, 'data-ranking');
+      const professors = readNumber(row, 'data-professors');
+
+      const matchesTokens = tokens.every((token) => `${program} ${department} ${university} ${location}`.includes(token));
+      const matchesProgram = !programFilter || program.includes(programFilter);
+      const matchesDepartment = !departmentFilter || department.includes(departmentFilter);
+      const matchesUniversity = !universityFilter || university.includes(universityFilter);
+      const matchesCountry = !countryFilter || country.includes(countryFilter);
+      const matchesState = !stateFilter || state.includes(stateFilter);
+      const matchesCity = !cityFilter || city.includes(cityFilter);
+
+      const matchesRankingMin = rankingMin === null || (ranking !== null && ranking >= rankingMin);
+      const matchesRankingMax = rankingMax === null || (ranking !== null && ranking <= rankingMax);
+      const matchesProfMin = profMin === null || (professors !== null && professors >= profMin);
+      const matchesProfMax = profMax === null || (professors !== null && professors <= profMax);
+      const matchesHasProf = !hasProfessors || (professors !== null && professors > 0);
+
+      const visible = matchesTokens &&
+        matchesProgram &&
+        matchesDepartment &&
+        matchesUniversity &&
+        matchesCountry &&
+        matchesState &&
+        matchesCity &&
+        matchesRankingMin &&
+        matchesRankingMax &&
+        matchesProfMin &&
+        matchesProfMax &&
+        matchesHasProf;
+
+      row.style.display = visible ? '' : 'none';
+    });
+
+    sortProgramRows();
+  }
+
+  function sortProgramRows() {
+    const sortSelect = getById('programSortBy');
+    const table = getById('programsTable');
+
+    if (!sortSelect || !table) {
+      return;
+    }
+
+    const sortBy = sortSelect.value;
+    if (!sortBy) {
+      return;
+    }
+
+    const tbody = table.querySelector('tbody');
+    if (!tbody) {
+      return;
+    }
+
+    const rows = Array.from(tbody.querySelectorAll('tr')).filter((row) => row.style.display !== 'none');
+
+    const getText = (row, attr) => normalize(row.getAttribute(attr));
+
+    const compareAlphabetical = (a, b, attr, direction = 'asc') => {
+      const aText = getText(a, attr);
+      const bText = getText(b, attr);
+      return direction === 'asc' ? aText.localeCompare(bText) : bText.localeCompare(aText);
+    };
+
+    const compareNumeric = (a, b, attr, direction = 'asc') => {
+      const aNum = readNumber(a, attr);
+      const bNum = readNumber(b, attr);
+
+      if (aNum === null && bNum === null) {
+        return 0;
+      }
+      if (aNum === null) {
+        return direction === 'asc' ? 1 : -1;
+      }
+      if (bNum === null) {
+        return direction === 'asc' ? -1 : 1;
+      }
+
+      return direction === 'asc' ? aNum - bNum : bNum - aNum;
+    };
+
+    rows.sort((a, b) => {
+      switch (sortBy) {
+        case 'program-asc':
+          return compareAlphabetical(a, b, 'data-program', 'asc');
+        case 'program-desc':
+          return compareAlphabetical(a, b, 'data-program', 'desc');
+        case 'department-asc':
+          return compareAlphabetical(a, b, 'data-department', 'asc');
+        case 'department-desc':
+          return compareAlphabetical(a, b, 'data-department', 'desc');
+        case 'university-asc':
+          return compareAlphabetical(a, b, 'data-university', 'asc');
+        case 'university-desc':
+          return compareAlphabetical(a, b, 'data-university', 'desc');
+        case 'professors-asc':
+          return compareNumeric(a, b, 'data-professors', 'asc');
+        case 'professors-desc':
+          return compareNumeric(a, b, 'data-professors', 'desc');
+        case 'ranking-asc':
+          return compareNumeric(a, b, 'data-ranking', 'asc');
+        case 'ranking-desc':
+          return compareNumeric(a, b, 'data-ranking', 'desc');
+        default:
+          return 0;
+      }
+    });
+
+    rows.forEach((row) => tbody.appendChild(row));
+  }
+
+  function clearProgramFilters() {
+    const ids = [
+      'programGlobalSearch',
+      'programFilterName',
+      'programFilterDepartment',
+      'programFilterUniversity',
+      'programFilterCountry',
+      'programFilterState',
+      'programFilterCity',
+      'programFilterRankingMin',
+      'programFilterRankingMax',
+      'programFilterProfMin',
+      'programFilterProfMax',
+      'programSortBy',
+    ];
+
+    ids.forEach((id) => {
+      const el = getById(id);
+      if (el) {
+        el.value = '';
+      }
+    });
+
+    const hasProfessors = getById('programFilterHasProfessors');
+    if (hasProfessors) {
+      hasProfessors.checked = false;
+    }
+
+    filterPrograms();
+  }
+
   function attachFilterListeners() {
     const map = [
       ['globalSearch', 'input', debounce(filterTable, 200)],
@@ -206,6 +398,31 @@
       ['filterUniversity', 'input', debounce(filterTable, 200)],
       ['filterDepartment', 'input', debounce(filterTable, 200)],
       ['sortBy', 'change', filterTable],
+    ];
+
+    map.forEach(([id, event, handler]) => {
+      const el = getById(id);
+      if (el) {
+        el.addEventListener(event, handler);
+      }
+    });
+  }
+
+  function attachProgramFilterListeners() {
+    const map = [
+      ['programGlobalSearch', 'input', debounce(filterPrograms, 200)],
+      ['programFilterName', 'input', debounce(filterPrograms, 200)],
+      ['programFilterDepartment', 'input', debounce(filterPrograms, 200)],
+      ['programFilterUniversity', 'input', debounce(filterPrograms, 200)],
+      ['programFilterCountry', 'input', debounce(filterPrograms, 200)],
+      ['programFilterState', 'input', debounce(filterPrograms, 200)],
+      ['programFilterCity', 'input', debounce(filterPrograms, 200)],
+      ['programFilterRankingMin', 'input', debounce(filterPrograms, 200)],
+      ['programFilterRankingMax', 'input', debounce(filterPrograms, 200)],
+      ['programFilterProfMin', 'input', debounce(filterPrograms, 200)],
+      ['programFilterProfMax', 'input', debounce(filterPrograms, 200)],
+      ['programFilterHasProfessors', 'change', filterPrograms],
+      ['programSortBy', 'change', filterPrograms],
     ];
 
     map.forEach(([id, event, handler]) => {
@@ -262,10 +479,14 @@
 
   document.addEventListener('DOMContentLoaded', () => {
     attachFilterListeners();
+    attachProgramFilterListeners();
     setupDeletionHandler();
 
     if (getById('professorTable')) {
       filterTable();
+    }
+    if (getById('programsTable')) {
+      filterPrograms();
     }
   });
 
@@ -273,4 +494,5 @@
   window.editProfessor = editProfessor;
   window.deleteProfessor = deleteProfessor;
   window.clearFilters = clearFilters;
+  window.clearProgramFilters = clearProgramFilters;
 })();
