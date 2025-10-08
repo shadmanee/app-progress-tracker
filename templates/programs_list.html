@@ -70,42 +70,45 @@
     </div>
 </div>
 
+<!-- Table -->
 <div class="table-container">
-    <table class="table table-striped" id="programsTable">
-        <thead>
-            <tr>
-                <th scope="col" class="text-center">Department</th>
-                <th scope="col" class="text-center">University</th>
-                <th scope="col" class="text-center">Location</th>
-                <th scope="col" class="text-center">Program</th>
-                <th scope="col" class="text-center">Professors</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for program, prof_count in programs %}
-            {% set dept = program.department %}
-            {% set uni = dept.university %}
-            {% set prof_count = prof_count or 0 %}
-            <tr
-                data-program="{{ program.name|lower }}"
-                data-department="{{ dept.name|lower }}"
-                data-university="{{ uni.name|lower }}"
-                data-country="{{ uni.country|lower }}"
-                data-state="{{ (uni.state or '')|lower }}"
-                data-city="{{ uni.city|lower }}"
-                data-location="{{ (uni.city ~ ' ' ~ (uni.state or '') ~ ' ' ~ uni.country)|lower }}"
-                data-ranking="{{ uni.ranking_usnews or '' }}"
-                data-professors="{{ prof_count }}"
-            >
-                <td>{{ dept.name }}</td>
-                <td>{{ uni.name }}</td>
-                <td>{{ uni.city }}{% if uni.state %}, {{ uni.state }}{% endif %}{% if uni.country %}, {{ uni.country }}{% endif %}</td>
-                <td>{{ program.name }}</td>
-                <td class="text-center">{{ prof_count }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+  <table class="table table-striped" id="programsTable">
+    <thead>
+      <tr>
+        <th scope="col" class="text-center">Department</th>
+        <th scope="col" class="text-center">University</th>
+        <th scope="col" class="text-center">Location</th>
+        <th scope="col" class="text-center">Program</th>
+        <th scope="col" class="text-center">Professors</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for program in programs %}
+        {% set dept = program.department %}
+        {% set uni = program.university %}
+        {% set prof_count = program.prof_count or 0 %}
+        <tr
+          data-program="{{ program.name|lower }}"
+          data-department="{{ dept.name|lower }}"
+          data-university="{{ uni.name|lower }}"
+          data-country="{{ (uni.country or '')|lower }}"
+          data-state="{{ (uni.state or '')|lower }}"
+          data-city="{{ (uni.city or '')|lower }}"
+          data-location="{{ ((uni.city or '') ~ ' ' ~ (uni.state or '') ~ ' ' ~ (uni.country or ''))|lower }}"
+          data-ranking="{{ uni.ranking_usnews or '' }}"
+          data-professors="{{ prof_count }}"
+        >
+          <td>{{ dept.name }}</td>
+          <td>{{ uni.name }}</td>
+          <td>
+            {{ uni.city }}{% if uni.state %}, {{ uni.state }}{% endif %}{% if uni.country %}, {{ uni.country }}{% endif %}
+          </td>
+          <td>{{ program.name }}</td>
+          <td class="text-center">{{ prof_count }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
 
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
