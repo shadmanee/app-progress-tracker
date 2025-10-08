@@ -82,10 +82,10 @@
             </tr>
         </thead>
         <tbody>
-            {% for program in programs %}
+            {% for program, prof_count in programs %}
             {% set dept = program.department %}
             {% set uni = dept.university %}
-            {% set prof_count = program.professors|length %}
+            {% set prof_count = prof_count or 0 %}
             <tr
                 data-program="{{ program.name|lower }}"
                 data-department="{{ dept.name|lower }}"

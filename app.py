@@ -1,8 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_migrate import Migrate
+from sqlalchemy import func
 from sqlalchemy.orm import joinedload
 from models import db, Professor, University, Department, Program, ResearchArea
-from models import HiringStatus, ContactThrough
+from models import HiringStatus, ContactThrough, professor_programs
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///phd_tracker.db'
@@ -244,11 +245,17 @@ def delete_professor(professor_id):
 @app.route('/programs')
 def programs_list():
     programs = (
-        Program.query
+        db.session.query(
+            Program,
+            func.count(professor_programs.c.professor_id).label('professor_count')
+        )
         .options(
             joinedload(Program.department).joinedload(Department.university)
         )
-        .join(Department).join(University)
+        .join(Department)
+        .join(University)
+        .outerjoin(professor_programs, Program.id == professor_programs.c.program_id)
+        .group_by(Program.id, Department.id, University.id)
         .order_by(University.name.asc(), Department.name.asc(), Program.name.asc())
         .all()
     )
