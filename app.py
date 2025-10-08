@@ -1,8 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask_migrate import Migrate
+from sqlalchemy import func, distinct
 from sqlalchemy.orm import joinedload
 from models import db, Professor, University, Department, Program, ResearchArea
-from models import HiringStatus, ContactThrough
+from models import HiringStatus, ContactThrough, professor_programs
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///phd_tracker.db'
@@ -243,15 +244,55 @@ def delete_professor(professor_id):
 
 @app.route('/programs')
 def programs_list():
-    programs = (
-        Program.query
-        .options(
-            joinedload(Program.department).joinedload(Department.university)
+    rows = (
+        db.session.query(
+            Program.name.label('program_name'),
+            Department.id.label('dept_id'),
+            Department.name.label('dept_name'),
+            University.id.label('uni_id'),
+            University.name.label('uni_name'),
+            University.city.label('uni_city'),
+            University.state.label('uni_state'),
+            University.country.label('uni_country'),
+            University.ranking_usnews.label('uni_rank'),
+            func.count(distinct(professor_programs.c.professor_id)).label('prof_count')
         )
-        .join(Department).join(University)
+        .join(Department, Program.department_id == Department.id)
+        .join(University, Department.university_id == University.id)
+        .outerjoin(professor_programs, professor_programs.c.program_id == Program.id)
+        # GROUP BY the identity of the “unique” combo (program name + dept + uni)
+        .group_by(
+            Program.name,
+            Department.id, Department.name,
+            University.id, University.name, University.city, University.state, University.country, University.ranking_usnews
+        )
         .order_by(University.name.asc(), Department.name.asc(), Program.name.asc())
         .all()
     )
+
+    # Shape into dicts the template can use easily
+    programs = [
+        {
+            "name": r.program_name,
+            "department": {
+                "id": r.dept_id,
+                "name": r.dept_name,
+            },
+            "university": {
+                "id": r.uni_id,
+                "name": r.uni_name,
+                "city": r.uni_city,
+                "state": r.uni_state,
+                "country": r.uni_country,
+                "ranking_usnews": r.uni_rank,
+            },
+            "prof_count": r.prof_count,
+        }
+        for r in rows
+    ]
+    
+    print("\n\n", programs, "\n\n")
+
     return render_template("programs_list.html", programs=programs)
     
 if __name__ == '__main__':
